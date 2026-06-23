@@ -190,6 +190,6 @@ curl -X POST https://{api-id}.execute-api.us-east-1.amazonaws.com/prod/payment \
 
 Built as part of the **AWS Cloud Accelerator** program — Week 7 Capstone.
 
-Live API: `https://{api-id}.execute-api.us-east-1.amazonaws.com/prod/payment`
+Live API: `https://pa1hw2i7zd.execute-api.us-east-1.amazonaws.com/prod/payment`
 
-> Built by Oluwatoba | [LinkedIn](#) | [Portfolio](#)
+> Built by Oluwatoba | [X / Twitter](https://x.com/Itz_Greatbabz/status/2069239800704475605?s=20) | [Portfolio](#)
