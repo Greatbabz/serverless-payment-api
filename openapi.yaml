@@ -1,0 +1,178 @@
+openapi: 3.0.1
+info:
+  title: Serverless Payment API
+  description: >
+    A serverless payment processing API built on AWS Lambda, API Gateway,
+    DynamoDB, SQS, and SNS. Processes payments, persists transactions, queues
+    async jobs, and sends alerts for large payments.
+  version: "1.0.0"
+  contact:
+    name: Oluwatoba
+servers:
+  - url: https://{apiId}.execute-api.us-east-1.amazonaws.com/prod
+    description: Production
+    variables:
+      apiId:
+        default: pa1hw2i7zd
+        description: API Gateway ID
+
+paths:
+  /payment:
+    post:
+      summary: Process a payment
+      description: >
+        Accepts a payment request, persists it to DynamoDB,
+        queues it to SQS for async processing, and triggers
+        an SNS email alert if the amount exceeds 100,000.
+      operationId: processPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+            examples:
+              normal_payment:
+                summary: Normal payment
+                value:
+                  sender: Alice
+                  recipient: Bob
+                  amount: 5000
+                  reference: TXN-001
+              large_payment:
+                summary: Large payment (triggers SNS alert)
+                value:
+                  sender: Alice
+                  recipient: Bob
+                  amount: 500000
+                  reference: TXN-002
+      responses:
+        '200':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+              example:
+                message: Payment processed successfully
+                reference: TXN-001
+                timestamp: "2026-06-23T01:11:22.102005"
+                status: Completed
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /payments/{id}:
+    get:
+      summary: Get a transaction by ID
+      description: >
+        Queries DynamoDB for a transaction by TransactionID.
+        Returns full transaction details if found.
+      operationId: getPayment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The TransactionID of the payment
+          schema:
+            type: string
+          example: TXN-001
+      responses:
+        '200':
+          description: Transaction found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionRecord'
+              example:
+                TransactionID: TXN-001
+                Timestamp: "2026-06-23T01:11:22.102005"
+                Sender: Alice
+                Recipient: Bob
+                Amount: "5000.0"
+                Status: Completed
+        '404':
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: Transaction not found
+
+components:
+  schemas:
+    PaymentRequest:
+      type: object
+      required:
+        - sender
+        - recipient
+        - amount
+      properties:
+        sender:
+          type: string
+          description: Name or ID of the payment sender
+          example: Alice
+        recipient:
+          type: string
+          description: Name or ID of the payment recipient
+          example: Bob
+        amount:
+          type: number
+          description: Payment amount (triggers SNS alert if > 100,000)
+          example: 5000
+        reference:
+          type: string
+          description: Optional transaction reference ID (auto-generated if omitted)
+          example: TXN-001
+
+    PaymentResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Payment processed successfully
+        reference:
+          type: string
+          example: TXN-001
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-06-23T01:11:22.102005"
+        status:
+          type: string
+          enum: [Completed, Failed]
+          example: Completed
+
+    TransactionRecord:
+      type: object
+      properties:
+        TransactionID:
+          type: string
+          example: TXN-001
+        Timestamp:
+          type: string
+          format: date-time
+          example: "2026-06-23T01:11:22.102005"
+        Sender:
+          type: string
+          example: Alice
+        Recipient:
+          type: string
+          example: Bob
+        Amount:
+          type: string
+          example: "5000.0"
+        Status:
+          type: string
+          example: Completed
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Transaction not found
