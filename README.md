@@ -192,4 +192,4 @@ Built as part of the **AWS Cloud Accelerator** program — Week 7 Capstone.
 
 Live API: `https://pa1hw2i7zd.execute-api.us-east-1.amazonaws.com/prod/payment`
 
-> > Built by Oluwatoba | [X / Twitter](https://x.com/Itz_Greatbabz) | [Portfolio](http://oluwatoba-portfolio.s3-website-us-east-1.amazonaws.com)
+> Built by Oluwatoba | [X / Twitter](https://x.com/Itz_Greatbabz) | [Portfolio](http://oluwatoba-portfolio.s3-website-us-east-1.amazonaws.com)
